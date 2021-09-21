@@ -78,10 +78,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 29
+        "__id__": 30
       },
       {
-        "__id__": 30
+        "__id__": 31
       }
     ],
     "_prefab": null,
@@ -251,10 +251,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 27
+        "__id__": 28
       },
       {
-        "__id__": 28
+        "__id__": 29
       }
     ],
     "_prefab": null,
@@ -1042,6 +1042,9 @@
       },
       {
         "__id__": 26
+      },
+      {
+        "__id__": 27
       }
     ],
     "_prefab": null,
@@ -1184,6 +1187,25 @@
     },
     "_enabled": true,
     "_id": "d42hCuFEJAp4MDREcfBMff"
+  },
+  {
+    "__type__": "cc.Animation",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 22
+    },
+    "_enabled": true,
+    "_defaultClip": {
+      "__uuid__": "296de00e-820e-4236-a887-a71a3fe5a71a"
+    },
+    "_clips": [
+      {
+        "__uuid__": "296de00e-820e-4236-a887-a71a3fe5a71a"
+      }
+    ],
+    "playOnLoad": true,
+    "_id": "a80axAh7xFRYg6M6rFy4Gs"
   },
   {
     "__type__": "cc.Widget",

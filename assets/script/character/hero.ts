@@ -8,21 +8,25 @@ const enum State {
 }
 
 const enum Animation {
-    idle = 1,
+    idle = 'idle',
+    run = 'run',
 }
 
 @ccclass
 export default class NewClass extends cc.Component {
 
     private heroState = State.stand;
-    private animationType = Animation.idle;
+    private currentAnim = Animation.idle;
     private moveSpeed = 200;
     private sp = cc.v2(0, 0);
     private lv: cc.Vec2;
+    private heroAnim: cc.Animation;
 
     onLoad() {
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.handleKeyDown, this);
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.handleKeyUp, this);
+
+        this.heroAnim = this.node.getComponent(cc.Animation);
     }
 
     onDestroy() {
@@ -38,10 +42,18 @@ export default class NewClass extends cc.Component {
         input[e.keyCode] = true;
     }
 
+    setHeroAnim(animName: Animation) {
+        if (this.currentAnim == animName) return;
+
+        this.currentAnim = animName;
+        this.heroAnim.play(animName);
+    }
+
     update(dt) {
         const heroRigidBody = this.node.getComponent(cc.RigidBody);
         const scaleX = Math.abs(this.node.scaleX);
         let isMoving = false;
+        let anim: Animation;
 
         this.lv = heroRigidBody.linearVelocity;
 
@@ -50,6 +62,7 @@ export default class NewClass extends cc.Component {
             this.node.scaleX = -scaleX;
             this.sp.x = -1;
             isMoving = true;
+            anim = Animation.run;
         }
 
         // move right
@@ -57,14 +70,17 @@ export default class NewClass extends cc.Component {
             this.node.scaleX = scaleX;
             this.sp.x = 1;
             isMoving = true;
+            anim = Animation.run;
         }
 
         if (isMoving) {
             this.lv.x = this.sp.x * this.moveSpeed;
         } else {
             this.lv.x = 0;
+            anim = Animation.idle;
         }
 
+        if (anim) this.setHeroAnim(anim);
         heroRigidBody.linearVelocity = this.lv;
     }
 }
