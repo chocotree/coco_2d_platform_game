@@ -18,27 +18,29 @@ export default class NewClass extends cc.Component {
     private heroState = State.stand;
     private currentAnim = Animation.idle;
     private moveSpeed = 200;
-    private sp = cc.v2(0, 0);
-    private lv: cc.Vec2;
+    private speedDirection = cc.v2(0, 0);
+    private characterLv: cc.Vec2;
     private heroAnim: cc.Animation;
+    private heroRigidBody: cc.RigidBody;
 
     onLoad() {
-        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.handleKeyDown, this);
-        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.handleKeyUp, this);
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
 
         this.heroAnim = this.node.getComponent(cc.Animation);
+        this.heroRigidBody = this.node.getComponent(cc.RigidBody);
     }
 
     onDestroy() {
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.handleKeyDown, this);
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.handleKeyUp, this);
+        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
     }
 
-    handleKeyUp(e) {
+    onKeyUp(e) {
         input[e.keyCode] = false;
     }
 
-    handleKeyDown(e) {
+    onKeyDown(e) {
         input[e.keyCode] = true;
     }
 
@@ -49,38 +51,46 @@ export default class NewClass extends cc.Component {
         this.heroAnim.play(animName);
     }
 
-    update(dt) {
-        const heroRigidBody = this.node.getComponent(cc.RigidBody);
+    changeCharacterDirection(direction: "left" | "right") {
         const scaleX = Math.abs(this.node.scaleX);
-        let isMoving = false;
-        let anim: Animation;
+        if (direction === 'left') this.node.scaleX = -scaleX;
+        if (direction === 'right') this.node.scaleX = scaleX;
+    }
 
-        this.lv = heroRigidBody.linearVelocity;
+    handleKeyPress() {
+        let anim = Animation.idle;
 
         // move left
         if (input[cc.macro.KEY.a] || input[cc.macro.KEY.left]) {
-            this.node.scaleX = -scaleX;
-            this.sp.x = -1;
-            isMoving = true;
+            this.changeCharacterDirection('left');
+            this.speedDirection.x = -1;
             anim = Animation.run;
         }
 
         // move right
         if (input[cc.macro.KEY.d] || input[cc.macro.KEY.right]) {
-            this.node.scaleX = scaleX;
-            this.sp.x = 1;
-            isMoving = true;
+            this.changeCharacterDirection('right');
+            this.speedDirection.x = 1;
             anim = Animation.run;
         }
 
-        if (isMoving) {
-            this.lv.x = this.sp.x * this.moveSpeed;
+        this.setHeroAnim(anim)
+    }
+
+    updateCharacterVelocity() {
+        this.characterLv = this.heroRigidBody.linearVelocity;
+
+        if (this.currentAnim === Animation.run) {
+            this.characterLv.x = this.speedDirection.x * this.moveSpeed;
         } else {
-            this.lv.x = 0;
-            anim = Animation.idle;
+            this.characterLv.x = 0;
         }
 
-        if (anim) this.setHeroAnim(anim);
-        heroRigidBody.linearVelocity = this.lv;
+        this.heroRigidBody.linearVelocity = this.characterLv;
+    }
+
+    update(dt) {
+        this.handleKeyPress();
+        this.updateCharacterVelocity();
     }
 }
