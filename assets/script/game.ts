@@ -2,6 +2,7 @@ import { devConfig } from './config/devConfig';
 
 const { ccclass, property } = cc._decorator;
 
+// TODO: add enemy
 @ccclass
 export default class NewClass extends cc.Component {
 
