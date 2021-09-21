@@ -1,9 +1,4 @@
-// Learn TypeScript:
-//  - https://docs.cocos.com/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - https://docs.cocos.com/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
+import { devConfig } from './config/devConfig';
 
 const { ccclass, property } = cc._decorator;
 
@@ -19,7 +14,10 @@ export default class NewClass extends cc.Component {
     onLoad() {
         const physicsManager = cc.director.getPhysicsManager();
         physicsManager.enabled = true;
-        // physicsManager.debugDrawFlags = 1;
+
+        if (devConfig.isDebugPhysics) {
+            physicsManager.debugDrawFlags = 1;
+        }
 
         this.initMapNode(this.node);
     }
