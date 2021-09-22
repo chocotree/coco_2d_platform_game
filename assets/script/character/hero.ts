@@ -17,7 +17,6 @@ const enum Animation {
 
 @ccclass
 export default class NewClass extends cc.Component {
-
     /** character state machines */
     private heroState = State.STAND;
     /** which animation is been playing now */
@@ -44,7 +43,6 @@ export default class NewClass extends cc.Component {
         this.heroAnim.on(cc.Animation.EventType.FINISHED, this.onAnimFinished, this);
     }
 
-
     onDestroy() {
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
@@ -60,7 +58,8 @@ export default class NewClass extends cc.Component {
     }
 
     onAnimFinished(e, animState: cc.AnimationState) {
-        if (animState.name === Animation.COMBO1 ||
+        if (
+            animState.name === Animation.COMBO1 ||
             animState.name === Animation.COMBO2 ||
             animState.name === Animation.COMBO3
         ) {
@@ -76,53 +75,55 @@ export default class NewClass extends cc.Component {
         this.heroAnim.play(animName);
     }
 
-    changeCharacterDirection(direction: "left" | "right") {
+    changeCharacterDirection(direction: 'left' | 'right') {
         const scaleX = Math.abs(this.node.scaleX);
         if (direction === 'left') this.node.scaleX = -scaleX;
         if (direction === 'right') this.node.scaleX = scaleX;
     }
 
-    handleKeyPress() {
-        let anim: Animation;
+    characterMove() {
+        let anim = Animation.Idle;
+        this.animComboCount = 0;
 
+        // move left
+        if (input[cc.macro.KEY.a] || input[cc.macro.KEY.left]) {
+            this.changeCharacterDirection('left');
+            this.speedDirection.x = -1;
+            anim = Animation.RUN;
+        }
+
+        // move right
+        if (input[cc.macro.KEY.d] || input[cc.macro.KEY.right]) {
+            this.changeCharacterDirection('right');
+            this.speedDirection.x = 1;
+            anim = Animation.RUN;
+        }
+
+        this.setHeroAnim(anim);
+    }
+
+    characterAttack() {
+        const isNormalComboAttack = input[cc.macro.KEY.c] || input[cc.macro.KEY.j];
+        if (isNormalComboAttack) {
+            if (this.animComboCount === 0) this.setHeroAnim(Animation.COMBO1);
+            if (this.animComboCount === 1) this.setHeroAnim(Animation.COMBO2);
+            if (this.animComboCount === 2) this.setHeroAnim(Animation.COMBO3);
+        }
+    }
+
+    handleKeyPress() {
         switch (this.heroState) {
-            case State.STAND: {
-                if (input[cc.macro.KEY.c] || input[cc.macro.KEY.j]) {
-                    this.heroState = State.ATTACK;
+            case State.STAND:
+                {
+                    if (input[cc.macro.KEY.c] || input[cc.macro.KEY.j]) {
+                        this.heroState = State.ATTACK;
+                    }
                 }
-            }
                 break;
         }
 
-        if (this.heroState === State.ATTACK) {
-            // attack
-            if (input[cc.macro.KEY.c] || input[cc.macro.KEY.j]) {
-                if (this.animComboCount === 0) anim = Animation.COMBO1;
-                if (this.animComboCount === 1) anim = Animation.COMBO2;
-                if (this.animComboCount === 2) anim = Animation.COMBO3;
-            }
-        }
-
-        if (this.heroState === State.STAND) {
-            anim = Animation.Idle;
-            this.animComboCount = 0;
-
-            // move left
-            if (input[cc.macro.KEY.a] || input[cc.macro.KEY.left]) {
-                this.changeCharacterDirection('left');
-                this.speedDirection.x = -1;
-                anim = Animation.RUN;
-            }
-
-            // move right
-            if (input[cc.macro.KEY.d] || input[cc.macro.KEY.right]) {
-                this.changeCharacterDirection('right');
-                this.speedDirection.x = 1;
-                anim = Animation.RUN;
-            }
-        }
-
-        if (anim) this.setHeroAnim(anim)
+        if (this.heroState === State.ATTACK) this.characterAttack();
+        if (this.heroState === State.STAND) this.characterMove();
     }
 
     updateCharacterVelocity() {
@@ -142,4 +143,3 @@ export default class NewClass extends cc.Component {
         this.updateCharacterVelocity();
     }
 }
-
