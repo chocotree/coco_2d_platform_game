@@ -2,7 +2,8 @@
   "group-list": [
     "default",
     "hero",
-    "wall"
+    "wall",
+    "enemy"
   ],
   "collision-matrix": [
     [
@@ -11,11 +12,18 @@
     [
       false,
       false,
+      true,
       true
     ],
     [
       false,
       true,
+      false
+    ],
+    [
+      false,
+      true,
+      false,
       false
     ]
   ],

@@ -4,7 +4,6 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class NewClass extends cc.Component {
-
     @property(cc.Label)
     label: cc.Label = null;
 
@@ -13,10 +12,16 @@ export default class NewClass extends cc.Component {
 
     onLoad() {
         const physicsManager = cc.director.getPhysicsManager();
+        const collisionManager = cc.director.getCollisionManager();
         physicsManager.enabled = true;
+        collisionManager.enabled = true;
 
         if (devConfig.isDebugPhysics) {
             physicsManager.debugDrawFlags = 1;
+        }
+
+        if (devConfig.isDebugCollision) {
+            collisionManager.enabledDebugDraw = true;
         }
 
         this.initMapNode(this.node);
@@ -35,15 +40,12 @@ export default class NewClass extends cc.Component {
                 this.drawWallPhysicsBoxColliders({
                     tiled,
                     colliderSize: tiledSize,
-                })
+                });
             }
         }
     }
 
-    drawWallPhysicsBoxColliders(params: {
-        tiled: cc.TiledTile,
-        colliderSize: cc.Size,
-    }) {
+    drawWallPhysicsBoxColliders(params: { tiled: cc.TiledTile; colliderSize: cc.Size }) {
         const { tiled, colliderSize } = params;
 
         if (tiled.gid !== 0) {
